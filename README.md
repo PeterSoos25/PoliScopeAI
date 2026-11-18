@@ -1,6 +1,7 @@
 # PolSci & IR MA AI Ügynök (Magyar + Európai Mesterszak Összesítő és Összehasonlító)
 
 Valós idejű, élő webes keresésre és hivatalos egyetemi honlapok (URL-ek) automatikus elemzésére épülő **AI ügynök és interaktív webes alkalmazás**, amely összesíti és összehasonlítja a **magyarországi és európai egyetemek politikatudományi (Political Science MA/MSc)**, **nemzetközi tanulmányok (International Relations)**, **politikai gazdaságtan (Political Economy)**, **közpolitika (Public Policy)** és **biztonságpolitika** mesterszakjait.
+Itt lehet megnyitni: https://poliscopeai.onrender.com/
 
 Kifejezetten **2020-as Mac gépekre (Apple Silicon M1 és Intel Core i5/i7, 8 GB / 16 GB RAM)** és **teljesen helyi (offline-képes) Ollama LLM** futtatásra optimalizálva.
 
