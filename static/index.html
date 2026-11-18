@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PolSci &amp; IR MA AI Ügynök — Magyar és Európai Mesterszakok Élő Összehasonlítása</title>
+  <meta
+    name="description"
+    content="Magyar és európai egyetemek politikatudományi, nemzetközi tanulmányok és közpolitikai mesterszakjainak (MA/MSc) élő webes összesítő és 7-dimenziós összehasonlító AI ügynöke, 2020-as Mac + helyi Ollama optimalizációval."
+  />
+  <link rel="stylesheet" href="/static/index.css" />
+</head>
+<body>
+  <!-- Top Editorial Masthead & 2020 Mac / Local Ollama Control Bar -->
+  <header class="masthead" role="banner">
+    <div class="masthead-inner">
+      <div class="brand-block">
+        <h1>PolSci &amp; IR Mesterszak Összesítő és Összehasonlító AI Ügynök</h1>
+        <p class="brand-subtitle">
+          Magyar és európai egyetemek politikatudományi, nemzetközi kapcsolatok és politikai gazdaságtani MA/MSc képzéseinek
+          valós idejű webelemzése 7 dimenzió mentén — 2020-as Mac-re (Ollama) optimalizálva.
+        </p>
+      </div>
+
+      <div class="mac-ollama-bar" aria-label="Helyi Ollama AI Modell Állapot és Vezérlő">
+        <div class="status-indicator" id="ollama-status-pill">
+          <span class="status-dot" id="ollama-status-dot"></span>
+          <span id="ollama-status-text">Ollama ellenőrzése...</span>
+        </div>
+
+        <div class="model-select-group">
+          <label for="ollama-model-select">2020 Mac Modell:</label>
+          <select id="ollama-model-select" class="select-control" aria-label="Ollama modell kiválasztása">
+            <option value="qwen2.5:3b">qwen2.5:3b (~1.9 GB RAM - Ajánlott)</option>
+            <option value="llama3.2:3b">llama3.2:3b (~2.0 GB RAM - M1 Gyors)</option>
+            <option value="qwen2.5:1.5b">qwen2.5:1.5b (~1.0 GB RAM - Intel Mac)</option>
+            <option value="qwen2.5:7b">qwen2.5:7b (~4.7 GB RAM - 16GB Mac)</option>
+          </select>
+        </div>
+
+        <button type="button" id="btn-ollama-pull" class="btn btn-sm btn-primary" title="Kiválasztott modell letöltése / aktiválása a helyi Ollama szerveren">
+          Modell Aktiválása
+        </button>
+
+        <a href="/api/export/markdown" target="_blank" id="btn-export-markdown" class="btn btn-sm btn-secondary" style="text-decoration: none;">
+          Markdown Riport Letöltése
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container" role="main">
+    <!-- Live Web Search & Real-Time URL Scraper Console -->
+    <section class="agent-console" aria-labelledby="console-heading">
+      <div class="console-header">
+        <div>
+          <h2 id="console-heading">Élő Webes Kereső és Egyetemi URL Elemző Ügynök</h2>
+          <span class="console-caption">
+            Írj be egy keresőkérdést (pl. <em>„ELTE és Corvinus nemzetközi tanulmányok”</em>, <em>„holland politikatudomány MSc”</em>)
+            vagy illessz be bármilyen hivatalos egyetemi szakoldal URL-t a valós idejű 7-szempontos elemzéshez!
+          </span>
+        </div>
+        <div id="stats-counter-badge" class="mono-pill">Betöltött képzések: 0</div>
+      </div>
+
+      <form id="live-agent-form" class="live-search-form">
+        <div class="search-input-wrap">
+          <input
+            type="text"
+            id="agent-query-input"
+            class="search-input"
+            placeholder="Pl.: https://tatk.elte.hu/mesterszakok/nemzetkozi vagy 'CEU és Leiden politikatudomány összehasonlítás'..."
+            required
+          />
+        </div>
+        <button type="submit" id="btn-run-live-search" class="btn btn-primary">
+          Élő Keresés &amp; Weboldal Elemzés Indítása
+        </button>
+        <button type="button" id="btn-refresh-comparison" class="btn btn-navy">
+          AI Összehasonlítás Frissítése
+        </button>
+      </form>
+
+      <!-- 1-Click Live University URL Presets -->
+      <div class="preset-section">
+        <div class="preset-row" id="presets-hu-row">
+          <span class="preset-label">Magyar Egyetemek (Élő URL):</span>
+          <button type="button" class="preset-chip" data-url="https://www.ajk.elte.hu/kepzesek/ma">ELTE ÁJK Politikatudomány MA</button>
+          <button type="button" class="preset-chip" data-url="https://tatk.elte.hu/mesterszakok/nemzetkozi">ELTE TáTK Nemzetközi tanulmányok MA</button>
+          <button type="button" class="preset-chip" data-url="https://www.uni-corvinus.hu/post/landing-page/mesterkepzesek/politikai-gazdasagtan/">Corvinus Politikai gazdaságtan MA</button>
+          <button type="button" class="preset-chip" data-url="https://www.uni-corvinus.hu/post/landing-page/mesterkepzesek/nemzetkozi-tanulmanyok/">Corvinus Nemzetközi tanulmányok MA</button>
+          <button type="button" class="preset-chip" data-url="https://btk.ppke.hu/ma-felvetelizoknek-2">PPKE BTK Politikatudomány MA</button>
+          <button type="button" class="preset-chip" data-url="https://antk.uni-nke.hu/oktatas/mesterkepzes/nemzetkozi-tanulmanyok-mesterkepzesi-szak">NKE Nemzetközi &amp; Biztonságpolitika MA</button>
+          <button type="button" class="preset-chip" data-url="https://btk.pte.hu/hu/kepzeseink/politikatudomany-mesterszak">PTE BTK Politikatudomány / NK MA</button>
+        </div>
+
+        <div class="preset-row" id="presets-eu-row">
+          <span class="preset-label">Európai Egyetemek (Élő URL):</span>
+          <button type="button" class="preset-chip" data-url="https://www.ceu.edu/academics/degrees/ma-politics-2-years">CEU Vienna MA in Politics</button>
+          <button type="button" class="preset-chip" data-url="https://www.ceu.edu/academics/degrees/ma-international-relations-2-years">CEU Vienna MA in IR</button>
+          <button type="button" class="preset-chip" data-url="https://www.kuleuven.be/programmes/master-international-politics">KU Leuven MSc International Politics</button>
+          <button type="button" class="preset-chip" data-url="https://www.uva.nl/en/masters/masters-programmes/political-science">UvA Amsterdam MSc Political Science</button>
+          <button type="button" class="preset-chip" data-url="https://www.universiteitleiden.nl/en/education/study-programmes/master/political-science">Leiden / The Hague MSc Political Science</button>
+          <button type="button" class="preset-chip" data-url="https://www.sciencespo.fr/psia/academics/master-international-governance-diplomacy/">Sciences Po Paris Diplomacy &amp; PolSci</button>
+          <button type="button" class="preset-chip" data-url="https://www.lse.ac.uk/study-at-lse/Graduate/degree-programmes-2024/MSc-Political-Science">LSE London MSc Political Science</button>
+          <button type="button" class="preset-chip" data-url="https://corsi.unibo.it/2cycle/InternationalRelations">Bologna MA International Relations</button>
+        </div>
+      </div>
+
+      <!-- Real-Time Agent Execution Log Banner -->
+      <div id="agent-live-banner" class="agent-status-banner" role="status" aria-live="polite">
+        <span id="agent-live-message">Ügynök készenlétben.</span>
+        <span id="agent-live-detail"></span>
+      </div>
+    </section>
+
+    <!-- View Switcher & Filters -->
+    <section class="toolbar-bar" aria-label="Nézetválasztó és Szűrők">
+      <div class="view-tabs" role="tablist">
+        <button type="button" class="view-tab active" id="tab-btn-matrix" data-tab="matrix" role="tab" aria-selected="true">
+          1. 7-Szempontos Összehasonlító Táblázat
+        </button>
+        <button type="button" class="view-tab" id="tab-btn-cards" data-tab="cards" role="tab" aria-selected="false">
+          2. Részletes Képzési Adatlapok &amp; Nehézség
+        </button>
+        <button type="button" class="view-tab" id="tab-btn-advisor" data-tab="advisor" role="tab" aria-selected="false">
+          3. AI Összehasonlító Szintézis &amp; Tanácsadó Chat
+        </button>
+      </div>
+
+      <div class="filter-controls">
+        <input
+          type="search"
+          id="filter-search-input"
+          class="filter-input"
+          placeholder="Szűrés egyetemre, tárgyra, városra..."
+          aria-label="Szűrés a betöltött képzések között"
+        />
+
+        <select id="filter-region-select" class="filter-select" aria-label="Régió szűrő">
+          <option value="all">Minden régió (Magyar + Európai)</option>
+          <option value="Magyarország">Csak Magyarország (HU)</option>
+          <option value="Európa">Csak Európa / Nemzetközi (EU/UK)</option>
+        </select>
+
+        <select id="filter-category-select" class="filter-select" aria-label="Szakterület szűrő">
+          <option value="all">Minden szakterület</option>
+          <option value="Politikatudomány">Politikatudomány</option>
+          <option value="Nemzetközi kapcsolatok">Nemzetközi kapcsolatok / Diplomácia</option>
+          <option value="Politikai gazdaságtan">Politikai gazdaságtan</option>
+          <option value="Biztonságpolitika">Biztonság- és védelempolitika</option>
+        </select>
+
+        <select id="filter-sort-select" class="filter-select" aria-label="Rendezés">
+          <option value="diff-desc">Nehézség szerint (Legnehezebb elöl)</option>
+          <option value="diff-asc">Nehézség szerint (Legkönnyebb elöl)</option>
+          <option value="ects-asc">Képzés hossza (1 évesek elöl)</option>
+          <option value="uni-asc">Egyetem neve (A–Z)</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- VIEW 1: 7-Dimension Comparison Matrix -->
+    <section id="view-panel-matrix" class="view-panel">
+      <div class="matrix-wrapper">
+        <table class="comparison-table" id="comparison-matrix-table">
+          <thead>
+            <tr>
+              <th style="width: 18%;">1. Képzés &amp; Egyetem</th>
+              <th style="width: 10%;">2. Hossza &amp; Kredit</th>
+              <th style="width: 11%;">3. Helye &amp; Nyelve</th>
+              <th style="width: 16%;">4. Fókusza &amp; Specializációk</th>
+              <th style="width: 18%;">5. Főbb Tantárgyak</th>
+              <th style="width: 14%;">6. Felvételi Követelmények</th>
+              <th style="width: 13%;">7. Képzés Nehézsége</th>
+            </tr>
+          </thead>
+          <tbody id="matrix-tbody">
+            <!-- Dynamically populated by app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 2: Detailed Cards & 4-Dimensional Difficulty Breakdown -->
+    <section id="view-panel-cards" class="view-panel" style="display: none;">
+      <div class="cards-grid" id="cards-container">
+        <!-- Dynamically populated by app.js -->
+      </div>
+    </section>
+
+    <!-- VIEW 3: Executive AI Synthesis & Interactive Advisor Chat -->
+    <section id="view-panel-advisor" class="view-panel" style="display: none;">
+      <div class="advisor-layout">
+        <div class="synthesis-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 style="font-family: var(--font-serif); margin: 0;">AI Összehasonlító Szintézis &amp; Rangsor</h2>
+            <span id="synthesis-engine-badge" class="badge badge-cat">Elemző Motor</span>
+          </div>
+          <div id="synthesis-content" class="markdown-body">
+            Betöltés...
+          </div>
+        </div>
+
+        <div class="chat-panel">
+          <h2 style="font-family: var(--font-serif); margin: 0 0 0.4rem 0;">AI Felvételi és Karrier Tanácsadó Chat</h2>
+          <p style="font-size: 0.84rem; color: var(--text-secondary); margin-top: 0;">
+            Kérdezz az élőben legyűjtött magyar és európai szakokról! A válaszokat a helyi Ollama modell és a strukturált szabálymotor generálja.
+          </p>
+
+          <div class="chat-quick-questions">
+            <button type="button" class="preset-chip chat-prompt-chip" data-q="Melyik képzés a legnehezebb és melyikre a legkönnyebb bekerülni?">
+              Nehézségi rangsor &amp; bekerülés
+            </button>
+            <button type="button" class="preset-chip chat-prompt-chip" data-q="Hasonlítsd össze a magyar és az európai egyetemek felvételi követelményeit és nyelvvizsga elvárásait!">
+              Magyar vs. Európai felvételi
+            </button>
+            <button type="button" class="preset-chip chat-prompt-chip" data-q="Melyik szakon a legerősebb a kvantitatív kutatásmódszertan és adatelemzés?">
+              Kvantitatív / módszertani fókusz
+            </button>
+            <button type="button" class="preset-chip chat-prompt-chip" data-q="Mennyi ideig tartanak a képzések és milyen ösztöndíj / tandíj lehetőségek vannak?">
+              Hossz &amp; Ösztöndíjak
+            </button>
+          </div>
+
+          <div id="chat-messages-box" class="chat-messages">
+            <div class="chat-bubble agent">
+              Üdvözöllek! Én a <strong>PolSci &amp; IR MA AI Ügynök</strong> vagyok. Az adatbázisban lévő magyar és európai mesterszakokat élő webes forrásokból elemeztem a 7 fő kritérium (képzés, hossz, hely, fókusz, tárgyak, felvételi, nehézség) alapján. Melyik egyetemeket hasonlítsam össze számodra?
+            </div>
+          </div>
+
+          <form id="advisor-chat-form" style="display: flex; gap: 0.5rem;">
+            <input
+              type="text"
+              id="advisor-chat-input"
+              class="search-input"
+              placeholder="Írd be a kérdésed (pl. ELTE vs CEU vs Leiden)..."
+              required
+            />
+            <button type="submit" id="btn-send-chat" class="btn btn-primary">Küldés</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
